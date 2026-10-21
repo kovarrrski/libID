@@ -414,6 +414,51 @@ while it is its author's name; publication is state.
   bound, and a handle with no owner, are answered no; none of these answers
   refuses a transaction.
 
+### 2.1c The bind operation
+
+The bind call is the Consumer's transaction kind under operation domain
+`keccak256(UTF8("libid.bind-identity"))`. Its Authorized Transaction Data
+is the target address alone; on EVM, `abi.encode(address)`, 32 bytes
+([chain profiles](chain-profiles.md) §3.3). It also takes the service fee
+amount and receiver of §2.1b, which no proof commits.
+
+- REQ-PLAT-08P (upholds SP-BIND-01, SP-REPLAY-01):
+  The Consumer MUST accept a bind call only under the operation domain
+  `keccak256(UTF8("libid.bind-identity"))`. The Consumer MUST reject
+  Authorized Transaction Data that is not exactly one target in the Chain
+  Profile's encoding. The Consumer MUST reject a bind call whose
+  Transaction Author is not that target.
+  Necessity: the target is the one value the user authorized, and requiring
+  the Transaction Author to be the target leaves a proof usable only by the
+  wallet it names.
+- REQ-PLAT-08Q (upholds SP-BIND-01):
+  The Consumer MUST reject a bind call whose fee amount is zero while its fee
+  receiver is nonzero, or whose fee amount is nonzero while its fee receiver is
+  the zero address. The Consumer MUST reject a bind call whose native value
+  differs from the quotation of common REQ-COMMON-06E plus the fee amount.
+  On accepting a bind call with a nonzero fee amount, the Consumer MUST
+  transfer exactly that amount to the fee receiver. The Consumer MUST reject
+  the bind call when that transfer fails. The Consumer MUST emit an event
+  naming the Authorization Digest, the fee receiver, and the amount for every
+  fee it transfers. Necessity: the proof authorizes a binding, not a price,
+  so the fee stays outside the digest and the Transaction Author agrees to
+  it by authoring the call. Exact value needs no refund path, and
+  `(0, zero address)` as the only free form leaves no fee without a
+  receiver.
+
+- TEST-PLAT-20E (exercises REQ-PLAT-08P, REQ-PLAT-08Q):
+  A bind call under another operation domain is rejected. Authorized
+  Transaction Data that is not exactly one encoded target, including a
+  target followed by a chain identifier, is rejected, and so is a bind call
+  whose Transaction Author is not the target. One Submission is accepted by
+  the Consumers of two Consumer Chains, once at each, and a second bind call
+  of it on either is rejected. A fee amount without a receiver, and a
+  receiver without an amount, are rejected. A native value one unit above or
+  below the quotation plus the fee amount is rejected. An accepted bind call
+  with a fee delivers exactly the amount to the receiver and emits the fee
+  event; a receiver that refuses the value rejects the bind call; and a bind
+  call without a fee moves exactly the quotation.
+
 ### 2.2 Metadata ordering and validity ceilings
 
 Proof validity and mutable-metadata ordering use the authenticated times below.
@@ -504,8 +549,8 @@ Conformance vector, for the Authorization Digest of
 [common §5](ceremony-common.md#5-authorization-digest):
 
 ```text
-authorizationDigest = 0xb318fb559e16a179b853ed2853576cda16032d93b0839bb81a55135d334c0af5
-Google nonce         = sxj7VZ4WoXm4U-0oU1ds2hYDLZOwg5u4GlUTXTNMCvU
+authorizationDigest = 0x24083f6c849372d1fa0a95615a7b2b6a888edef92e9fa2bebd520b2f536e9350
+Google nonce         = JAg_bISTctH6CpVhWnsraoiO3vkun6K-vVILL1Nuk1A
 ```
 
 ### 3.2 Browser token validation
@@ -1803,6 +1848,9 @@ notary signature; the Consumer Chain's Notary Service remains authoritative.
 A proof built outside the Canonical Runtime still faces those downstream
 checks and the Transaction Author rule in
 [common §12](ceremony-common.md#12-security-considerations).
+The Application names the bind call's service fee amount and receiver. No
+proof bounds them; the Transaction Author's review of the call is the only
+check.
 Proxy notarization exposes session traffic to the notary; the protocol does
 not promise bearer confidentiality from that notary. The bearer remains
 hidden from the published proof by the two commitments and link circuit,

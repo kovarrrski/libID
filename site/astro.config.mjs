@@ -3,11 +3,14 @@ import starlight from '@astrojs/starlight';
 import { unified } from '@astrojs/markdown-remark';
 import specMarkdown from './src/spec-markdown.mjs';
 import { description } from './src/tagline.mjs';
+import indexableSitemap from './src/sitemap.mjs';
 
 export default defineConfig({
   site: 'https://lib.id',
+  trailingSlash: 'always',
   markdown: { processor: unified({ remarkPlugins: [specMarkdown] }) },
   integrations: [
+    indexableSitemap(),
     starlight({
       title: 'libID',
       description,
@@ -28,6 +31,7 @@ export default defineConfig({
       components: {
         Head: './src/components/Head.astro',
         Sidebar: './src/components/Sidebar.astro',
+        SkipLink: './src/components/SkipLink.astro',
         ThemeProvider: './src/components/ThemeProvider.astro',
         ThemeSelect: './src/components/ThemeSelect.astro',
       },

@@ -9,6 +9,17 @@ const isSpecs = Astro.url.pathname.startsWith('/specs/');
 </nav>
 <DefaultSidebar />
 
+<script>
+  const button = document.querySelector<HTMLButtonElement>('[popovertarget="starlight__sidebar"]');
+  const pane = document.getElementById('starlight__sidebar');
+  if (button && pane) {
+    button.setAttribute('aria-controls', pane.id);
+    const update = () => button.setAttribute('aria-expanded', String(pane.matches(':popover-open')));
+    update();
+    pane.addEventListener('toggle', update);
+  }
+</script>
+
 <style>
   .section-switch {
     display: flex;

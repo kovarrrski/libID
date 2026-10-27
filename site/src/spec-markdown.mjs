@@ -1,7 +1,7 @@
 // Keep repository Markdown links and headings usable on the published spec pages.
 export default function specMarkdown() {
   return (tree, file) => {
-    if (!file.path?.includes('/specs/')) return;
+    if (!file.path?.replace(/\\/g, '/').includes('/specs/')) return;
     if (tree.children[0]?.type === 'heading' && tree.children[0].depth === 1) {
       tree.children.shift();
     }

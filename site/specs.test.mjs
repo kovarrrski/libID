@@ -13,13 +13,13 @@ const source = `# Spec title
 
 [rules]: ./ceremony-common.md#2-terminology
 `;
-const { code } = await processor.render(source, { fileURL: new URL('file:///repo/specs/example.md') });
+const { code } = await processor.render(source, { fileURL: new URL('./specs/example.md', import.meta.url) });
 assert.doesNotMatch(code, /<h1/);
 assert.match(code, /<h2/);
 assert.match(code, /href="\/specs\/#protocol-parameters"/);
 assert.match(code, /href="\/specs\/ceremony-common\/#2-terminology"/);
 assert.match(code, /href="https:\/\/example.com\/file.md"/);
-const docs = await processor.render(source, { fileURL: new URL('file:///repo/docs/example.md') });
+const docs = await processor.render(source, { fileURL: new URL('./docs/example.md', import.meta.url) });
 assert.match(docs.code, /<h1/);
 assert.match(docs.code, /href="libid.md#protocol-parameters"/);
 console.log('Spec Markdown checks passed.');

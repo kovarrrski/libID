@@ -1,9 +1,13 @@
 ---
 import ThemeProvider from '../components/ThemeProvider.astro';
 import { palettes } from '../palette.mjs';
-import { description, tagline } from '../tagline.mjs';
+import { tagline } from '../tagline.mjs';
 import libronFont from '../../../brand/libron/Libron-Regular.woff2?url';
 import '../styles/home.css';
+import StructuredData from '../components/StructuredData.astro';
+
+const title = 'libID — Social identity primitives and protocols';
+const description = 'libID provides protocols and software for verifying control of social accounts and using existing identities in applications on verifiable ledgers.';
 ---
 
 <!doctype html>
@@ -11,12 +15,14 @@ import '../styles/home.css';
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>libID — {tagline}</title>
+    <title>{title}</title>
     <meta name="description" content={description}>
+    <link rel="canonical" href="https://lib.id/">
+    <link rel="sitemap" href="/sitemap-index.xml">
     <meta name="theme-color" content={palettes.dark.background}>
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://lib.id/">
-    <meta property="og:title" content={`libID — ${tagline}`}>
+    <meta property="og:title" content={title}>
     <meta property="og:description" content={description}>
     <meta property="og:image" content="https://lib.id/og.png">
     <meta property="og:image:type" content="image/png">
@@ -24,19 +30,25 @@ import '../styles/home.css';
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="The libID wordmark on a dark background.">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content={title}>
+    <meta name="twitter:description" content={description}>
+    <meta name="twitter:image" content="https://lib.id/og.png">
+    <meta name="twitter:image:alt" content="The libID wordmark on a dark background.">
+    <StructuredData />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="preload" href={libronFont} as="font" type="font/woff2" crossorigin>
     <ThemeProvider />
     <script src="../page.js"></script>
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <button class="theme-toggle" type="button" aria-label="Light theme" aria-pressed="false" hidden>
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <circle cx="12" cy="12" r="4"></circle>
         <path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"></path>
       </svg>
     </button>
-    <main>
+    <main id="main-content" tabindex="-1">
       <h1 class="wordmark">libID</h1>
       <p class="description">{tagline}</p>
       <nav aria-label="Explore libID">

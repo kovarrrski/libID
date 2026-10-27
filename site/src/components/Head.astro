@@ -1,10 +1,29 @@
 ---
 import DefaultHead from '@astrojs/starlight/components/Head.astro';
+import StructuredData from './StructuredData.astro';
 
-const { id } = Astro.locals.starlightRoute.entry;
+const route = Astro.locals.starlightRoute;
+const { id, data } = route.entry;
 const is404 = id === '404' || id.endsWith('/404');
+const meta = (name) => route.head.find((item) => item.tag === 'meta' &&
+  (item.attrs?.name === name || item.attrs?.property === name))?.attrs?.content;
+if (is404) {
+  route.head = route.head.filter((item) => !(item.tag === 'link' && item.attrs?.rel === 'canonical') &&
+    !(item.tag === 'meta' && item.attrs?.name === 'robots'));
+  route.head = route.head.map((item) => item.tag === 'title' ?
+    { ...item, content: 'Page not found | libID' } : item);
+}
 ---
 
 <DefaultHead />
-{is404 && <meta name="page-status" content="404" />}
+{is404 ? <>
+  <meta name="page-status" content="404" />
+  <meta name="robots" content="noindex" />
+</> : <>
+  <meta name="twitter:title" content={meta('og:title')} />
+  <meta name="twitter:description" content={meta('description')} />
+  <meta name="twitter:image" content="https://lib.id/og.png" />
+  <meta name="twitter:image:alt" content="The libID wordmark on a dark background." />
+  <StructuredData title={data.title} summary={meta('description')} url={meta('og:url')} />
+</>}
 <script src="../page.js"></script>

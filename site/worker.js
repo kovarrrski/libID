@@ -1,4 +1,4 @@
-export default {
+const handler = {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === '/p/client.js') {
@@ -55,5 +55,41 @@ export default {
     } catch {
       return new Response(null, { status: 502 });
     }
+  },
+};
+
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    const production = url.hostname === 'lib.id' || url.hostname === 'www.lib.id';
+    if (production && (url.protocol !== 'https:' || url.hostname !== 'lib.id')) {
+      url.protocol = 'https:';
+      url.hostname = 'lib.id';
+      url.port = '';
+      return Response.redirect(url.href, 301);
+    }
+    if (!production && url.pathname === '/robots.txt') {
+      return new Response('User-agent: *\nDisallow: /\n', {
+        headers: { 'Content-Type': 'text/plain; charset=utf-8', 'X-Robots-Tag': 'noindex' },
+      });
+    }
+    const response = await handler.fetch(request, env);
+    const location = response.headers.get('Location');
+    // Assets knows which pages exist. Only promote its HTML URL normalization;
+    // never guess a redirect for an unknown URL or redirect it to the homepage.
+    if (production && [307, 308].includes(response.status) && location) {
+      const target = new URL(location, url);
+      if (target.origin === url.origin &&
+        (target.pathname === `${url.pathname}/` ||
+          target.pathname === url.pathname.replace(/\/index\.html$/, '/'))) {
+        return Response.redirect(target.href, 301);
+      }
+    }
+    if (!production || response.status === 404) {
+      const result = new Response(response.body, response);
+      result.headers.set('X-Robots-Tag', 'noindex');
+      return result;
+    }
+    return response;
   },
 };

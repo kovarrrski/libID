@@ -7,8 +7,6 @@ social accounts and using those identities in applications on verifiable ledgers
 The specifications describe identity ceremonies, browser transport, and services.
 Read each specification's status and assumptions before treating it as implemented.
 
-handles.link is a separate product built on libID, not another name for the protocol.
-
 ## Main materials
 
 - [Home](https://lib.id/): Project overview.
@@ -19,9 +17,3 @@ handles.link is a separate product built on libID, not another name for the prot
 - [Browser transport](https://lib.id/specs/popup-transport/): Connections between applications and popup documents.
 - [Source code](https://github.com/libid-org/libID): Code, specifications, licenses, and links to related repositories.
 - [handles.link](https://handles.link/): Separate application using libID.
-
-## Content-use policy
-
-AI training is permitted by the site's chosen policy: ai-train=yes.
-See robots.txt for crawling rules and the optional Content-Signal policy.
-This file is a reading guide; it does not guarantee indexing, training, or citation.

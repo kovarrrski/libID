@@ -49,15 +49,6 @@
 /* Keep keyboard focus clear across navigation, search, and code controls. */
 :focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
 @media (min-width: 50rem) {
   .site-title {
     width: calc(var(--sl-sidebar-width) - 2 * var(--sl-nav-pad-x));

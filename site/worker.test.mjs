@@ -91,15 +91,12 @@ try {
   for (const path of ['/', '/docs/', '/specs/', '/missing/', '/p/event/other']) {
     const request = new Request(`https://lib.id${path}`);
     const assetResponse = new Response('asset', { status: path === '/missing/' ? 404 : 200 });
-    const result = await worker.fetch(request, {
+    assert.equal(await worker.fetch(request, {
       ASSETS: { fetch: async (received) => {
         assert.equal(received, request);
         return assetResponse;
       } },
-    });
-    assert.equal(result.status, assetResponse.status);
-    assert.equal(result.headers.get('X-Robots-Tag'), path === '/missing/' ? 'noindex' : null);
-    assert.equal(await result.text(), 'asset');
+    }), assetResponse);
   }
   assert.equal(upstreamCalls, callsBeforeRoutingChecks);
 
@@ -138,30 +135,3 @@ try {
   globalThis.fetch = originalFetch;
 }
 console.log('Worker proxy checks passed.');
-
-for (const origin of ['http://lib.id', 'http://www.lib.id', 'https://www.lib.id']) {
-  const response = await worker.fetch(new Request(`${origin}/specs/?utm_source=test`));
-  assert.equal(response.status, 301);
-  assert.equal(response.headers.get('Location'), 'https://lib.id/specs/?utm_source=test');
-}
-const assetRedirect = { ASSETS: { fetch: async () => new Response(null, {
-  status: 307, headers: { Location: '/docs/?utm_source=test' },
-}) } };
-const slash = await worker.fetch(new Request('https://lib.id/docs?utm_source=test'), assetRedirect);
-assert.equal(slash.status, 301);
-assert.equal(slash.headers.get('Location'), 'https://lib.id/docs/?utm_source=test');
-
-for (const host of ['branch.previews.lib.id', 'libid.example.workers.dev', '127.0.0.1']) {
-  for (const [path, status] of [['/docs/', 200], ['/missing', 404], ['/_astro/test.js', 200]]) {
-    const response = await worker.fetch(new Request(`https://${host}${path}`), {
-      ASSETS: { fetch: async () => new Response('asset', { status }) },
-    });
-    assert.equal(response.status, status);
-    assert.equal(response.headers.get('X-Robots-Tag'), 'noindex');
-  }
-  const robots = await worker.fetch(new Request(`https://${host}/robots.txt`));
-  assert.equal(robots.status, 200);
-  assert.match(await robots.text(), /Disallow: \//);
-  assert.equal(robots.headers.get('X-Robots-Tag'), 'noindex');
-}
-console.log('Worker canonical URL and preview indexing checks passed.');

@@ -3,14 +3,11 @@ import starlight from '@astrojs/starlight';
 import { unified } from '@astrojs/markdown-remark';
 import specMarkdown from './src/spec-markdown.mjs';
 import { description } from './src/tagline.mjs';
-import indexableSitemap from './src/sitemap.mjs';
 
 export default defineConfig({
   site: 'https://lib.id',
-  trailingSlash: 'always',
   markdown: { processor: unified({ remarkPlugins: [specMarkdown] }) },
   integrations: [
-    indexableSitemap(),
     starlight({
       title: 'libID',
       description,
@@ -21,6 +18,7 @@ export default defineConfig({
         { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
         { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
         { tag: 'meta', attrs: { property: 'og:image:alt', content: 'The libID wordmark on a dark background.' } },
+        { tag: 'meta', attrs: { name: 'twitter:image:alt', content: 'The libID wordmark on a dark background.' } },
       ],
       customCss: ['./src/styles/custom.css'],
       routeMiddleware: './src/route-data.ts',
